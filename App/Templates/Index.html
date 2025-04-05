@@ -1,97 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaf Counter</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-        }
-    </style>
+    <title>EcoSight - Plant Growth Monitoring</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body>
-    <h1>Leaf Counter</h1>
-    <div class="upload-container">
-        <input type="file" id="imageInput" accept=".jpg,.jpeg,.png" style="display: none;">
-        <button onclick="document.getElementById('imageInput').click()">Select Image</button>
-        <p>Or drag and drop an image here</p>
+
+<body class="bg-white">
+
+    <div class="flex flex-col ">
+
+        <!-- Background Image -->
+        <img src="{{ url_for('static', filename='images/Intro_img.png') }}" alt="Background"
+            class="absolute inset-0 object-cover w-full h-full opacity-100">
+
+        <!-- Content Section -->
+        <div class="relative z-10 flex flex-col items-start  min-h-screen m-0 pl-30">
+
+            <!-- Logo -->
+            <div class="mb-20 mt-14 pl-0">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="EcoSight Logo" class="w-80">
+            </div>
+
+            <!-- Main Text -->
+            <p class="text-6xl font-light text-bg mb-6 font-inter">Empowering <br>Growth, One Pixel <br>at a Time</p>
+
+            <!-- Button -->
+            <a href="{{ url_for('dashboard') }}"
+                class="bg-green-800 text-white mt-25 py-3 px-6 rounded-md text-xl hover:bg-green-700 transition duration-300">Launch
+                EcoSight</a>
+        </div>
+
+        <div class="flex justify-center text-center pt-20 pb-0 ">
+            <p class="max-w-7xl text-lg text-bg">EcoSight is a plant growth monitoring web app that uses image
+                processing to track key growth indicators like leaf count, growth patterns, and plant health. It helps
+                users monitor plants in real-time, offering insights to make data-driven decisions for better care and
+                sustainability. Whether for personal use or larger agricultural projects, EcoSight makes plant
+                monitoring simple, efficient, and effective. With user-friendly features, EcoSight empowers you to
+                optimize plant growth, detect issues early, and promote a healthier, greener environment.</p>
+        </div>
+
+        <div class="flex flex-col justify-center items-center mt-30">
+            <p class="text-7xl text-bg mb-2">WE HAVE USED</p>
+            <p class="bg-bg text-center tracking-widest">Tech-Driven Plant Care, Made Simple</p>
+        </div>
     </div>
-    <img id="preview" alt="Image preview">
-    <a href="/dashboard" class="nav-button">Go to Dashboard</a>
-    <div id="result"></div>
 
+    <div class="bg-gray-100 py-12 mt-10 overflow-hidden">
+        <div class="container mx-auto">
+            <!-- Marquee container -->
+            <div class="relative flex overflow-x-hidden">
+                <!-- First set of logos -->
+                <div class="flex items-center animate-marquee whitespace-nowrap">
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/opencv.png') }}" alt="OpenCV"
+                            class="h-20 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/flask.png') }}" alt="Flask"
+                            class="h-20 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/mysql.png') }}" alt="MySQL"
+                            class="h-20 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/numpy.png') }}" alt="NumPy"
+                            class="h-20 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/git.png') }}" alt="Git"
+                            class="h-20 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/matpotlib.webp') }}"
+                            alt="Matplotlib" class="h-16 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/pycharm.jpeg') }}" alt="PyCharm"
+                            class="h-16 w-auto"></div>
+                </div>
+
+                <!-- Second set of logos -->
+                <div class="flex items-center animate-marquee2 whitespace-nowrap absolute top-0">
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/opencv.png') }}" alt="OpenCV"
+                            class="h-20 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/flask.png') }}" alt="Flask"
+                            class="h-20 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/mysql.png') }}" alt="MySQL"
+                            class="h-20 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/numpy.png') }}" alt="NumPy"
+                            class="h-20 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/git.png') }}" alt="Git"
+                            class="h-20 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/matpotlib.webp') }}"
+                            alt="Matplotlib" class="h-16 w-auto"></div>
+                    <div class="mx-12"><img src="{{ url_for('static', filename='images/pycharm.jpeg') }}" alt="PyCharm"
+                            class="h-16 w-auto"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col justify-center items-center mt-30">
+        <p class="text-7xl text-bg mb-10">ABOUT</p>
+    </div>
+
+    </div>
+    <div class="flex justify-center text-center pt-0 pb-0 ">
+        <p class="max-w-7xl text-lg text-bg">EcoSight is an advanced web-based platform designed to monitor plant growth
+            using cutting-edge image processing technology. Built with HTML, CSS, Tailwind CSS, and Flask, EcoSight
+            offers a responsive and dynamic user interface for tracking plant health and growth patterns over time.
+            The system integrates real-time image acquisition and processing techniques, utilizing Flask for backend
+            operations and data management. Tailwind CSS ensures a modern, clean, and mobile-friendly design, making
+            EcoSight both powerful and user-friendly. The web application allows users to track various plant indicators
+            such as leaf count, growth rate, and health status, enabling data-driven decisions for better plant care.
+            With a focus on sustainability, EcoSight uses efficient algorithms to analyze and visualize plant growth,
+            empowering users to monitor plant development from seedling to full maturity. Whether you're an individual
+            gardener, a researcher, or part of a larger agricultural initiative, EcoSight provides the tools to support
+            a healthier and more efficient growing process.</p>
+    </div>
+
+
+    <footer class="bg-white pt-40 ">
+        <div class="bg-gray-100 container mx-auto pl-10 pr-10 pt-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                <!-- Logo and Description -->
+                <div class="flex flex-col">
+                    <div class="flex items-center mb-4">
+                        <div class="flex items-center justify-center ">
+                            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="pycharm"
+                                class="h-11 w-auto">
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                        EcoSight uses advanced technology to <br>
+                        monitor plant growth, promote sustainability, <br>
+                        and empower smarter agricultural practices.
+                    </p>
+                </div>
+
+                <!-- Resources Column -->
+                <div>
+                    <h3 class="font-medium mb-4">Explore Developer Resources</h3>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>
+                            <link rel="stylesheet" href="">OpenCV
+                        </li>
+                        <li>Flask</li>
+                        <li>MySQL</li>
+                        <li>Numpy</li>
+                        <li>Git</li>
+                        <li>Matplotlib</li>
+                    </ul>
+                </div>
+
+                <!-- Team Members Column -->
+                <div>
+                    <h3 class="font-medium mb-4">GitHub Repository</h3>
+                    <div class="mt-4">
+                        <h4 class="text-sm font-medium mb-2">Team Members (Tech Sparks)</h4>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li class="flex justify-between">
+                                <span>G.P.C.L.Rathnayake</span>
+                                <span>ICT/2022/046</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>K.L.L.S.Liyanage</span>
+                                <span>ICT/2022/034</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>A.M.S.H.Madhusihan</span>
+                                <span>ICT/2022/074</span>
+                            </li>
+                            <li class="flex justify-between">
+                                <span>R.M.V.N.Rathnayake</span>
+                                <span>ICT/2022/087</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="text-center text-xs text-gray-600 mt-8">
+                © Copyright 2025, All Rights Reserved by EcoSight
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        const uploadContainer = document.querySelector('.upload-container');
-        const imageInput = document.getElementById('imageInput');
-        const preview = document.getElementById('preview');
-        const result = document.getElementById('result');
-
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadContainer.addEventListener(eventName, preventDefaults);
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        uploadContainer.addEventListener('drop', handleDrop);
-        imageInput.addEventListener('change', handleSelect);
-
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const file = dt.files[0];
-            handleFile(file);
-        }
-
-        function handleSelect(e) {
-            const file = e.target.files[0];
-            handleFile(file);
-        }
-
-        function handleFile(file) {
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-
-                uploadImage(file);
-            }
-        }
-
-        async function uploadImage(file) {
-            const formData = new FormData();
-            formData.append('image', file);
-
-            try {
-                result.textContent = 'Processing...';
-                const response = await fetch('/count_leaves', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-
-                if (response.ok) {
-                    result.textContent = data.message;
-                    result.classList.remove('error');
-                } else {
-                    result.textContent = data.error;
-                    result.classList.add('error');
-                }
-            } catch (error) {
-                result.textContent = 'Error processing image';
-                result.classList.add('error');
-            }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        marquee: 'marquee 25s linear infinite',
+                        marquee2: 'marquee2 25s linear infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' }
+                        },
+                        marquee2: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(0%)' }
+                        },
+                    },
+                },
+            },
         }
     </script>
+    <style>
+        @keyframes marquee {
+            0% {
+                transform: translate3d(0, 0, 0);
+            }
+
+            100% {
+                transform: translate3d(-100%, 0, 0);
+            }
+        }
+
+        @keyframes marquee2 {
+            0% {
+                transform: translate3d(100%, 0, 0);
+            }
+
+            100% {
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        .animate-marquee {
+            animation: marquee 25s linear infinite;
+        }
+
+        .animate-marquee2 {
+            animation: marquee2 25s linear infinite;
+        }
+    </style>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
 </body>
+
 </html>

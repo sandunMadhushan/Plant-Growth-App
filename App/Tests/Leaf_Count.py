@@ -158,8 +158,8 @@ def count_and_show_leaves(image_path):
         print(f"Error: {e}")
         return 0
 
-# Test with your image
+
 if __name__ == "__main__":
-    image_filename = "Asset/Images/2024_12_27_12AM_u.JPG"  # Path to the uploaded image
+    image_filename = "Asset/Images/2024_12_27_12AM_u.JPG"
     leaf_count = count_and_show_leaves(image_filename)
     print(f"Detected {leaf_count} individual leaves")

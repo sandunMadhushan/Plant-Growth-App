@@ -135,7 +135,7 @@ def measure_plant_height(image_path, pot_height_mm=None):
 
 # Example usage
 if __name__ == "__main__":
-    image_path = "2024_12_25_09PM.JPG"
+    image_path = "Asset/Images/2024_12_27_12AM_u.JPG"
     
     # If you know the actual height of the pot in mm, you can provide it for calibration
     pot_height_mm = 50  # Example value, replace with actual pot height if known

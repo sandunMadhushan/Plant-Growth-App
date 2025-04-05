@@ -46,3 +46,17 @@ def init_routes(app):
             })
 
         return jsonify({'error': 'Invalid file type'}), 400
+
+    @app.route('/run_leaf_count', methods=['POST'])
+    def run_leaf_count():
+        try:
+            image_path = os.path.join(os.path.dirname(__file__), "Static", "Images", "2024_12_27_12AM_u.JPG")
+            result = count_and_show_leaves(image_path)
+            return jsonify({
+                'leaf_count': result['leaf_count'],
+                'message': f'Detected {result["leaf_count"]} leaves',
+                'original_image': result['original_image'],
+                'processed_image': result['processed_image']
+            })
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500

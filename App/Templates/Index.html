@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaf Counter</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,26 +12,6 @@
             margin: 0 auto;
             padding: 20px;
             text-align: center;
-        }
-        .upload-container {
-            border: 2px dashed #ccc;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 5px;
-        }
-        #preview {
-            max-width: 100%;
-            max-height: 400px;
-            margin: 20px 0;
-            display: none;
-        }
-        #result {
-            margin: 20px 0;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        .error {
-            color: red;
         }
     </style>
 </head>

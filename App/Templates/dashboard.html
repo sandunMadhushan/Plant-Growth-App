@@ -3,60 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plant Growth Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>EcoSight - Plant Growth Monitoring</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body>
-    <h1>Plant Growth Dashboard</h1>
-    <a href="/" class="nav-button">Back to Leaf Counter</a>
-
-    <div class="dashboard-content">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total Plants</h3>
-                <p>0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Average Leaves</h3>
-                <p>0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Latest Analysis</h3>
-                <p>No data</p>
-            </div>
+    <div class="bg-gray-100 py-6 mt-5">
+        <div class="flex justify-center items-center">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="EcoSight Logo" class="w-50">
         </div>
-        <div class="leaf-count-section">
-            <button class="count-button" id="countButton">Show Leaf Count</button>
-            <p id="result"></p>
-            <div class="image-container">
-                <div class="image-box">
-                    <h3>Original Image</h3>
-                    <img id="originalImage" alt="Original Image">
-                </div>
-                <div class="image-box">
-                    <h3>Processed Image</h3>
-                    <img id="processedImage" alt="Processed Image">
-                </div>
+      </div>
+
+      <div class="bg-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    
+                <!-- Card 1: Plant Height Monitoring -->
+                <a href="https://your-url-for-plant-height-monitoring.com" class="bg-white rounded-2xl shadow-md overflow-hidden transform transition-all hover:scale-105 active:scale-95 hover:shadow-lg duration-300 ease-in-out">
+                    <img src="{{ url_for('static', filename='images/b1.png') }}" alt="Plant Height" class="w-full h-64 object-cover">
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-semibold text-green-900 mb-2">Plant Height Monitoring</h3>
+                        <p class="text-gray-600 text-sm">
+                            Measures growth using image analysis to track environmental impacts on plant height over time.
+                        </p>
+                    </div>
+                </a>
+    
+                <!-- Card 2: Leaf Count Monitoring -->
+                <a href="https://your-url-for-leaf-count-monitoring.com" class="bg-white rounded-2xl shadow-md overflow-hidden transform transition-all hover:scale-105 active:scale-95 hover:shadow-lg duration-300 ease-in-out">
+                    <img src="{{ url_for('static', filename='images/b2.png') }}" alt="Leaf Count" class="w-full h-64 object-cover">
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-semibold text-green-900 mb-2">Leaf-Count Monitoring</h3>
+                        <p class="text-gray-600 text-sm">
+                            Counts leaves through image processing, revealing growth trends and detecting stress or developmental issues.
+                        </p>
+                    </div>
+                </a>
+    
+                <!-- Card 3: Plant Health Monitoring -->
+                <a href="https://your-url-for-plant-health-monitoring.com" class="bg-white rounded-2xl shadow-md overflow-hidden transform transition-all hover:scale-105 active:scale-95 hover:shadow-lg duration-300 ease-in-out">
+                    <img src="{{ url_for('static', filename='images/b3.png') }}" alt="Plant Health" class="w-full h-64 object-cover">
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-semibold text-green-900 mb-2">Plant Health Monitoring</h3>
+                        <p class="text-gray-600 text-sm">
+                            Analyzes leaf color and texture to identify diseases, nutrient deficiencies, or pest-related problems early.
+                        </p>
+                    </div>
+                </a>
+    
             </div>
         </div>
     </div>
-
-<script>
-    document.getElementById('countButton').addEventListener('click', function() {
-        fetch('/run_leaf_count', {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('result').textContent = data.message;
-            document.getElementById('originalImage').src = 'data:image/png;base64,' + data.original_image;
-            document.getElementById('processedImage').src = 'data:image/png;base64,' + data.processed_image;
-        })
-        .catch(error => {
-            document.getElementById('result').textContent = 'Error: ' + error.message;
-        });
-    });
-</script>
-
+    
+    
+    
+      
 </body>
 </html>

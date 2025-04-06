@@ -63,34 +63,25 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <!-- Plant Height Monitoring Content -->
-        <!-- Plant Height Monitoring Content -->
-<div id="plant-height-content" class="content-section bg-white p-6 rounded-xl shadow-md">
-    <h2 class="text-2xl font-bold text-green-800 mb-6">Plant Height Monitoring Results</h2>
+        <div id="plant-height-content" class="content-section bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-xl font-bold text-green-800 mb-4">Plant Height Monitoring Results</h2>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Growth Graph Section -->
-        <div class="bg-white p-6 rounded-xl shadow-md">
-            <h3 class="text-xl text-green-700 font-semibold mb-4">Growth Trend Analysis</h3>
-            <img src="{{ url_for('static', filename='Asset/Images/Selected images/height/results/plant_height_growth.png') }}" alt="Plant Height Growth Chart" class="w-full rounded-lg">
-            <p class="text-gray-600 mt-4">This chart shows the plant's height progression over time, measured in pixels.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Growth Graph Section -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl text-green-700 font-semibold mb-4">Growth Trend Analysis</h3>
+                    <img src="{{ url_for('serve_assets', filename='Images/Selected images/height/results/plant_height_growth.png') }}" alt="Plant Height Growth Chart" class="w-full rounded-lg">
+                    <p class="text-gray-600 mt-4">This chart shows the plant's height progression over time, measured in pixels.</p>
+                </div>
+
+                <!-- Bar Chart Section -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl text-green-700 font-semibold mb-4">Comparative Growth Analysis</h3>
+                    <img src="{{ url_for('serve_assets', filename='Images/Selected images/height/results/plant_height_bars.png') }}" alt="Plant Height Bar Chart" class="w-full rounded-lg">
+                    <p class="text-gray-600 mt-4">Bar chart visualization allows easy comparison between measurement dates.</p>
+                </div>
+            </div>
         </div>
-
-        <!-- Bar Chart Section -->
-        <div class="bg-white p-6 rounded-xl shadow-md">
-            <h3 class="text-xl text-green-700 font-semibold mb-4">Comparative Growth Analysis</h3>
-            <img src="{{ url_for('static', filename='Asset/Images/Selected images/height/results/plant_height_bars.png') }}" alt="Plant Height Bar Chart" class="w-full rounded-lg">
-            <p class="text-gray-600 mt-4">Bar chart visualization allows easy comparison between measurement dates.</p>
-        </div>
-    </div>
-
-    <!-- Additional data visualization -->
-    <div class="mt-8 bg-white p-6 rounded-xl shadow-md">
-        <h3 class="text-xl text-green-700 font-semibold mb-4">Web Optimized Visualization</h3>
-        <img src="{{ url_for('static', filename='Asset/Images/Selected images/height/results/plant_height_web.png') }}" alt="Web Optimized Growth Chart" class="w-full rounded-lg">
-        <p class="text-gray-600 mt-4">Enhanced visualization with growth rate indicators and improved readability.</p>
-    </div>
-</div>
-
 
         <!-- Leaf Count Monitoring Content -->
         <div id="leaf-count-content" class="content-section bg-white p-6 rounded-xl shadow-md">
@@ -130,9 +121,12 @@
                     Object.values(cards).forEach(section => section.style.display = 'none');
                     Object.keys(cards).forEach(id => document.getElementById(id).classList.remove('card-highlight'));
 
-                    // Show the selected section
+                    // Show the selected section and scroll into view
                     content.style.display = 'block';
                     card.classList.add('card-highlight');
+
+                    // Smooth scroll to the selected section
+                    content.scrollIntoView({ behavior: 'smooth' });
                 }
             });
         });

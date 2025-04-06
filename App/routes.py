@@ -1,10 +1,12 @@
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, send_from_directory
 import os
 from werkzeug.utils import secure_filename
 import sys
 from Tests.Leaf_Count import count_and_show_leaves
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).parent.parent))
+
 
 def init_routes(app):
     # Configure upload folder
@@ -15,6 +17,15 @@ def init_routes(app):
     def allowed_file(filename):
         return '.' in filename and \
             filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+    # Add route to serve files from the Asset directory
+    @app.route('/assets/<path:filename>')
+    def serve_assets(filename):
+        # Determine the correct path to the Asset folder
+        # If Asset folder is at same level as App folder, need to go one level up
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        asset_path = os.path.join(base_dir, 'Asset')
+        return send_from_directory(asset_path, filename)
 
     @app.route('/')
     def index():

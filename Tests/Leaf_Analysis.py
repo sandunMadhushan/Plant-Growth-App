@@ -151,7 +151,7 @@ def analyze_images_and_plot(directory):
     days = []
 
     # Loop through images from day 1 to day 10
-    for day in range(1, 11):
+    for day in range(0, 11):
         # Try different possible file extensions
         found = False
         for ext in ['.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG']:

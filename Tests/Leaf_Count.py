@@ -19,14 +19,10 @@ def count_and_show_leaves(image_path):
         img = resize_image(img)
         original = img.copy()
 
-        # Apply Gaussian blur to reduce noise
         blurred = cv2.GaussianBlur(img, (5, 5), 0)
 
-        # Convert to HSV color space
         hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
 
-        # Create mask for bright green seedling leaves
-        # Narrower green range to avoid false positives
         lower_green = np.array([35, 50, 50])
         upper_green = np.array([85, 255, 255])
         green_mask = cv2.inRange(hsv, lower_green, upper_green)
@@ -36,15 +32,12 @@ def count_and_show_leaves(image_path):
         opening = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel, iterations=1)
         closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel, iterations=2)
 
-        # Create a mask to exclude the left side of the image where false detection occurred
         height, width = closing.shape
         left_mask = np.zeros((height, width), np.uint8)
-        # Only keep the central and right portion where the actual plant is
         left_mask[:, int(width * 0.3):] = 255
-        # Apply the mask to exclude false detections on the left
         processed_mask = cv2.bitwise_and(closing, left_mask)
 
-        # Find contours
+        # Find external contours
         contours, _ = cv2.findContours(processed_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         # Filter contours based on area and aspect ratio
@@ -76,7 +69,6 @@ def count_and_show_leaves(image_path):
             # Apply the same left-side mask
             a_thresh = cv2.bitwise_and(a_thresh, left_mask)
 
-            # Apply morphological operations
             a_processed = cv2.morphologyEx(a_thresh, cv2.MORPH_OPEN, kernel, iterations=1)
             a_processed = cv2.morphologyEx(a_processed, cv2.MORPH_CLOSE, kernel, iterations=2)
 
@@ -143,7 +135,7 @@ def count_and_show_leaves(image_path):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
             cv2.drawContours(result, [contour], -1, (0, 0, 255), 2)
 
-        # Display results
+    
         cv2.imshow("Original", original)
         cv2.imshow("Green Mask", green_mask)
         cv2.imshow("Processed Mask", processed_mask)

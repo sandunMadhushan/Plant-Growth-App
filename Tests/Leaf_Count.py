@@ -93,42 +93,42 @@ def count_and_show_leaves(image_path):
                         valid_contours.append(contour)
 
             # If we still don't have enough contours, try watershed segmentation
-            # if len(valid_contours) < 2:
-            #     # Start with our processed mask
-            #     sure_bg = cv2.dilate(processed_mask, kernel, iterations=3)
-            #
-            #     # Find sure foreground area using distance transform
-            #     dist_transform = cv2.distanceTransform(processed_mask, cv2.DIST_L2, 5)
-            #     _, sure_fg = cv2.threshold(dist_transform, 0.2 * dist_transform.max(), 255, 0)
-            #     sure_fg = np.uint8(sure_fg)
-            #
-            #     # Find unknown region
-            #     unknown = cv2.subtract(sure_bg, sure_fg)
-            #
-            #     # Marker labeling
-            #     _, markers = cv2.connectedComponents(sure_fg)
-            #     markers = markers + 1
-            #     markers[unknown == 255] = 0
-            #
-            #     # Apply watershed
-            #     markers = cv2.watershed(img, markers)
-            #
-            #     # Create a mask for each detected leaf region
-            #     leaf_mask = np.zeros_like(processed_mask)
-            #     for i in range(2, markers.max() + 1):
-            #         # Create a mask for this marker
-            #         curr_mask = np.zeros_like(processed_mask, dtype=np.uint8)
-            #         curr_mask[markers == i] = 255
-            #
-            #         # Find contours in this mask
-            #         curr_contours, _ = cv2.findContours(curr_mask, cv2.RETR_EXTERNAL,
-            #                                             cv2.CHAIN_APPROX_SIMPLE)
-            #
-            #         # Add valid contours
-            #         for contour in curr_contours:
-            #             area = cv2.contourArea(contour)
-            #             if min_leaf_area < area < max_leaf_area:
-            #                 valid_contours.append(contour)
+            if len(valid_contours) < 2:
+                # Start with our processed mask
+                sure_bg = cv2.dilate(processed_mask, kernel, iterations=3)
+
+                # Find sure foreground area using distance transform
+                dist_transform = cv2.distanceTransform(processed_mask, cv2.DIST_L2, 5)
+                _, sure_fg = cv2.threshold(dist_transform, 0.2 * dist_transform.max(), 255, 0)
+                sure_fg = np.uint8(sure_fg)
+
+                # Find unknown region
+                unknown = cv2.subtract(sure_bg, sure_fg)
+
+                # Marker labeling
+                _, markers = cv2.connectedComponents(sure_fg)
+                markers = markers + 1
+                markers[unknown == 255] = 0
+
+                # Apply watershed
+                markers = cv2.watershed(img, markers)
+
+                # Create a mask for each detected leaf region
+                leaf_mask = np.zeros_like(processed_mask)
+                for i in range(2, markers.max() + 1):
+                    # Create a mask for this marker
+                    curr_mask = np.zeros_like(processed_mask, dtype=np.uint8)
+                    curr_mask[markers == i] = 255
+
+                    # Find contours in this mask
+                    curr_contours, _ = cv2.findContours(curr_mask, cv2.RETR_EXTERNAL,
+                                                        cv2.CHAIN_APPROX_SIMPLE)
+
+                    # Add valid contours
+                    for contour in curr_contours:
+                        area = cv2.contourArea(contour)
+                        if min_leaf_area < area < max_leaf_area:
+                            valid_contours.append(contour)
 
         # Create result image showing the detected leaves
         result = original.copy()

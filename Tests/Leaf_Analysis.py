@@ -97,7 +97,7 @@ def count_and_show_leaves(image_path, show_debug=False):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
             cv2.drawContours(result, [contour], -1, (0, 0, 255), 2)
 
-        # ✅ Save debug image in the same folder as input
+        # Save debug image in the same folder as input
         debug_path = os.path.join(os.path.dirname(image_path), f"debug_{os.path.basename(image_path)}")
         cv2.imwrite(debug_path, result)
 

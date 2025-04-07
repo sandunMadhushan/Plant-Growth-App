@@ -89,6 +89,11 @@ def measure_plant_height(image_path, display=False):
                                    fx=display_scale,
                                    fy=display_scale,
                                    interpolation=cv2.INTER_AREA)
+        # Save resized image
+        resized_dir = os.path.join(os.path.dirname(image_path), "resized")
+        os.makedirs(resized_dir, exist_ok=True)
+        resized_path = os.path.join(resized_dir, f"resized_{os.path.basename(image_path)}")
+        cv2.imwrite(resized_path, resized_image)
 
         # Display result
         cv2.imshow("Plant Height", resized_image)

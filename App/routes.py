@@ -4,9 +4,13 @@ from werkzeug.utils import secure_filename
 import sys
 from Tests.Leaf_Count import count_and_show_leaves
 from pathlib import Path
+import re
 
 sys.path.append(str(Path(__file__).parent.parent))
 
+def natural_sort_key(s):
+    # Extract numbers from filenames for proper sorting
+    return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', s)]
 
 def init_routes(app):
     # Configure upload folder
@@ -34,18 +38,21 @@ def init_routes(app):
         asset_path = os.path.join(base_dir, 'Asset')
         return send_from_directory(asset_path, filename)
 
+    @app.route('/test-files/<path:filename>')
+    def serve_test_files(filename):
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        test_path = os.path.join(base_dir, 'Tests')
+        return send_from_directory(test_path, filename)
+
     @app.route('/')
     def index():
         return render_template('index.html')
 
     @app.route('/dashboard')
     def dashboard():
-        # Use absolute path to resized folder, consistent with serve_assets
+        # Existing code for resized images
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         resized_folder = os.path.join(base_dir, 'Asset', 'Images', 'Selected images', 'height', 'resized')
-
-        # Add debugging to confirm path and files
-        print(f"Looking for resized images in: {resized_folder}")
 
         # Check if folder exists
         if not os.path.exists(resized_folder):
@@ -54,9 +61,22 @@ def init_routes(app):
         else:
             # List all image files in the resized folder
             resized_images = [f for f in os.listdir(resized_folder) if f.endswith(('.jpg', '.jpeg', '.png', '.JPG'))]
-            print(f"Found {len(resized_images)} resized images: {resized_images}")
 
-        return render_template('dashboard.html', resized_images=resized_images)
+        # Get debug images from Tests/Images folder
+        debug_folder = os.path.join(base_dir, 'Tests', 'images')
+        if not os.path.exists(debug_folder):
+            print(f"ERROR: Debug folder does not exist: {debug_folder}")
+            debug_images = []
+        else:
+            # Get all debug day images and sort them
+            debug_images = [f for f in os.listdir(debug_folder) if
+                            f.startswith('debug_day_') and f.endswith(('.jpg', '.jpeg', '.png', '.JPG'))]
+            debug_images.sort(key=natural_sort_key)  # Sort to ensure proper ordering (debug_day_0.jpg to debug_day_10.jpg)
+
+        print(f"Debug folder path: {debug_folder}")
+        print(f"Files in debug folder: {os.listdir(debug_folder) if os.path.exists(debug_folder) else 'Folder not found'}")
+
+        return render_template('dashboard.html', resized_images=resized_images, debug_images=debug_images)
 
     @app.route('/count_leaves', methods=['POST'])
     def process_image():

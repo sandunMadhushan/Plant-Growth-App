@@ -44,6 +44,37 @@ def init_routes(app):
         test_path = os.path.join(base_dir, 'Tests')
         return send_from_directory(test_path, filename)
 
+    @app.route('/health-images/<path:filename>')
+    def health_images(filename):
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        health_path = os.path.join(base_dir, 'Asset', 'Images', 'Selected images', 'health')
+
+        # Check if the file exists in the root of the health folder
+        if os.path.exists(os.path.join(health_path, filename)):
+            return send_from_directory(health_path, filename)
+
+        # Check if the file exists in the measured_images subdirectory
+        measured_images_path = os.path.join(health_path, 'measured_images')
+        if os.path.exists(os.path.join(measured_images_path, filename)):
+            return send_from_directory(measured_images_path, filename)
+
+        # If file not found, return 404
+        return "File not found", 404
+
+    @app.route('/plant-health')
+    def plant_health():
+        # Get the base directory
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        measured_images_path = os.path.join(base_dir, 'Asset', 'Images', 'Selected images', 'health', 'measured_images')
+
+        # Get list of images in the folder
+        health_images = [f for f in os.listdir(measured_images_path) if f.lower().endswith(('.jpg', '.jpeg', '.png', '.JPG'))]
+
+        # Sort images naturally
+        health_images.sort(key=natural_sort_key)
+
+        return render_template('dashboard.html', health_images=health_images)
+
     @app.route('/')
     def index():
         return render_template('index.html')
@@ -73,10 +104,19 @@ def init_routes(app):
                             f.startswith('debug_day_') and f.endswith(('.jpg', '.jpeg', '.png', '.JPG'))]
             debug_images.sort(key=natural_sort_key)  # Sort to ensure proper ordering (debug_day_0.jpg to debug_day_10.jpg)
 
+
         print(f"Debug folder path: {debug_folder}")
         print(f"Files in debug folder: {os.listdir(debug_folder) if os.path.exists(debug_folder) else 'Folder not found'}")
 
-        return render_template('dashboard.html', resized_images=resized_images, debug_images=debug_images)
+        # Get health images
+        measured_images_path = os.path.join(base_dir, 'Asset', 'Images', 'Selected images', 'health', 'measured_images')
+        health_images = []
+        if os.path.exists(measured_images_path):
+            health_images = [f for f in os.listdir(measured_images_path)
+                             if f.lower().endswith(('.jpg', '.jpeg', '.png')) or f.upper().endswith('.JPG')]
+            health_images.sort(key=natural_sort_key)
+
+        return render_template('dashboard.html', resized_images=resized_images, debug_images=debug_images,  health_images=health_images)
 
     @app.route('/count_leaves', methods=['POST'])
     def process_image():

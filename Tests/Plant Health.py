@@ -41,10 +41,10 @@ def analyze_and_display_leaf_health(image_path):
     text = f"Health: {health_score * 100:.1f}%"
     color = (0, 255, 0) if health_score > 0.5 else (0, 0, 255)
 
-    cv2.putText(annotated_image, text, (20, 50), font, 1, color, 2)
+    cv2.putText(annotated_image, text, (20, 100), font, 4, color, 5)
 
     # Resize for better display
-    annotated_image = cv2.resize(annotated_image, (800, 600))
+    annotated_image = cv2.resize(annotated_image, (800, 800))
 
     return annotated_image
 

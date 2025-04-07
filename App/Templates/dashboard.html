@@ -124,7 +124,7 @@
                     <div class="overflow-hidden rounded-lg shadow-md">
                         <img src="{{ url_for('serve_test_files', filename='images/' + image) }}"
                              alt="{{ image }}"
-                             class="w-full h-auto object-cover hover:scale-105 transition-transform duration-300">
+                             class="w-full h-auto object-cover hover:scale-105 transition-transform duration-300 cursor-pointer lightbox-trigger">
                     </div>
                     {% endfor %}
                 </div>
@@ -135,7 +135,41 @@
         <!-- Plant Health Monitoring Content -->
         <div id="plant-health-content" class="content-section bg-white p-6 rounded-xl shadow-md">
             <h2 class="text-xl font-bold text-green-800 mb-4">Plant Health Monitoring Results</h2>
-            <p>Details about plant health monitoring...</p>
+
+            <!-- Health Graph Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl text-green-700 font-semibold mb-4">Health Trend Analysis</h3>
+                    <img src="{{ url_for('health_images', filename='plant_health_plot.png') }}"
+                         alt="Plant Health Growth Chart"
+                         class="w-full rounded-lg cursor-pointer lightbox-trigger">
+                    <p class="text-gray-600 mt-4">Chart showing plant health progression over time.</p>
+                </div>
+
+<!--                <div class="bg-white p-6 rounded-xl shadow-md">-->
+<!--                    <h3 class="text-xl text-green-700 font-semibold mb-4">Health Score Distribution</h3>-->
+<!--                    <img src="{{ url_for('serve_assets', filename='Images/Selected images/health/results/plant_health_distribution.png') }}"-->
+<!--                         alt="Plant Health Distribution"-->
+<!--                         class="w-full rounded-lg cursor-pointer lightbox-trigger">-->
+<!--                    <p class="text-gray-600 mt-4">Visualization of health score distribution across measurements.</p>-->
+<!--                </div>-->
+            </div>
+
+            <!-- Measured Health Images Section -->
+            <div class="mt-8 bg-white p-6 rounded-xl shadow-md">
+            <h3 class="text-xl text-green-700 font-semibold mb-4">Measured Health Images</h3>
+            <div class="grid grid-cols-5 gap-4">
+                {% for image in health_images %}
+                <div class="overflow-hidden rounded-lg shadow-md transition-transform duration-300 hover:scale-105">
+                    <img src="{{ url_for('health_images', filename='measured_images/' + image) }}"
+                         alt="Health analysis {{ image }}"
+                         class="w-full h-auto object-cover cursor-pointer lightbox-trigger">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+
         </div>
 
     </div>
@@ -191,8 +225,9 @@
     const closeModal = document.getElementById('closeModal');
 
     // Add click event to all resized images
-    document.querySelectorAll('#plant-height-content img').forEach(img => {
-        if (img.src.includes('/resized/')) {
+    // Lightbox functionality for all sections
+    document.querySelectorAll('#plant-height-content img, #leaf-count-content img, #plant-health-content img').forEach(img => {
+        if (img.src.includes('/resized/') || img.src.includes('/measured_images/')) {
             img.addEventListener('click', function() {
                 modalImage.src = this.src;
                 modal.classList.remove('hidden');
@@ -200,6 +235,16 @@
             });
         }
     });
+
+    // Add click event listeners to all images with the "lightbox-trigger" class
+    document.querySelectorAll('.lightbox-trigger').forEach(img => {
+        img.addEventListener('click', function () {
+            modalImage.src = this.src; // Set modal image source to clicked image source
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+    });
+
 
     // Close modal events
     closeModal.addEventListener('click', () => {
@@ -221,6 +266,15 @@
             modal.classList.remove('flex');
         }
     });
+
+    // Close modal when clicking outside the image
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    });
+
 
     </script>
 

@@ -10,7 +10,7 @@ def analyze_and_display_leaf_health(image_path):
         print(f"Could not read image: {image_path}")
         return None
 
-    # Convert to HSV color space
+    
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     # Define color ranges

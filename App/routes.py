@@ -19,11 +19,18 @@ def init_routes(app):
             filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
     # Add route to serve files from the Asset directory
+    # @app.route('/assets/<path:filename>')
+    # def serve_assets(filename):
+    #     # Determine the correct path to the Asset folder
+    #     # If Asset folder is at same level as App folder, need to go one level up
+    #     base_dir = os.path.dirname(os.path.dirname(__file__))
+    #     asset_path = os.path.join(base_dir, 'Asset')
+    #     return send_from_directory(asset_path, filename)
+
     @app.route('/assets/<path:filename>')
     def serve_assets(filename):
-        # Determine the correct path to the Asset folder
-        # If Asset folder is at same level as App folder, need to go one level up
-        base_dir = os.path.dirname(os.path.dirname(__file__))
+        # Navigate up from routes.py to project root, then to Asset folder
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         asset_path = os.path.join(base_dir, 'Asset')
         return send_from_directory(asset_path, filename)
 
@@ -33,7 +40,23 @@ def init_routes(app):
 
     @app.route('/dashboard')
     def dashboard():
-        return render_template('dashboard.html')
+        # Use absolute path to resized folder, consistent with serve_assets
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        resized_folder = os.path.join(base_dir, 'Asset', 'Images', 'Selected images', 'height', 'resized')
+
+        # Add debugging to confirm path and files
+        print(f"Looking for resized images in: {resized_folder}")
+
+        # Check if folder exists
+        if not os.path.exists(resized_folder):
+            print(f"ERROR: Folder does not exist: {resized_folder}")
+            resized_images = []
+        else:
+            # List all image files in the resized folder
+            resized_images = [f for f in os.listdir(resized_folder) if f.endswith(('.jpg', '.jpeg', '.png', '.JPG'))]
+            print(f"Found {len(resized_images)} resized images: {resized_images}")
+
+        return render_template('dashboard.html', resized_images=resized_images)
 
     @app.route('/count_leaves', methods=['POST'])
     def process_image():

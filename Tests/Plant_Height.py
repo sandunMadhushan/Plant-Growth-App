@@ -1,9 +1,12 @@
+import os
 import cv2
 import numpy as np
+import datetime
+import re
+import matplotlib.pyplot as plt
 
+def measure_plant_height(image_path, display=True):
 
-def measure_plant_height(image_path):
-    # Load the image
     image = cv2.imread(image_path)
     if image is None:
         print(f"Error: Could not load image from {image_path}")
@@ -12,7 +15,7 @@ def measure_plant_height(image_path):
     result_image = image.copy()
     height, width = image.shape[:2]
 
-    # STEP 1: ENHANCED PLANT DETECTION
+   
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     # Create broader masks for different plant colors
@@ -24,10 +27,10 @@ def measure_plant_height(image_path):
     upper_yellow = np.array([40, 255, 255])
     yellow_mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
-    # Combine masks
+
     plant_mask = cv2.bitwise_or(green_mask, yellow_mask)
 
-    # Clean the mask (smaller kernel for thin seedlings)
+ 
     kernel_small = np.ones((2, 2), np.uint8)
     kernel_large = np.ones((5, 5), np.uint8)
     plant_mask = cv2.morphologyEx(plant_mask, cv2.MORPH_OPEN, kernel_small)
@@ -37,166 +40,107 @@ def measure_plant_height(image_path):
     contours, _ = cv2.findContours(plant_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     if not contours:
-        print("No plant detected!")
+        print(f"No plant detected in {image_path}!")
         return None
 
-    # Find the plant contour
     plant_contour = max(contours, key=cv2.contourArea)
 
-    # Get plant bounding rectangle
     x, y, w, h = cv2.boundingRect(plant_contour)
 
-    # Check if this is a small seedling (for different processing)
-    is_small_plant = h < height * 0.2
+    # Get plant top and bottom points more precisely
+    hull = cv2.convexHull(plant_contour)
+    top_y = min(point[0][1] for point in hull)
+    bottom_y = max(point[0][1] for point in hull)
 
-    # Get plant top (y-coordinate)
-    top_y = y
+    
+    plant_height = bottom_y - top_y
 
-    # Find plant center
-    M = cv2.moments(plant_contour)
-    if M["m00"] != 0:
-        center_x = int(M["m10"] / M["m00"])
-    else:
-        center_x = x + w // 2
+  
+    if plant_height < h * 0.7:
+        plant_height = h
 
-    # STEP 2: SPECIALIZED SOIL DETECTION
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    edges = cv2.Canny(blurred, 30, 100)
-
-    # For small seedlings in glass pots, specifically target the soil line
-    if is_small_plant:
-        # Look specifically at the top edge of soil (right where pot begins)
-        soil_line_found = False
-
-        # Use the region right below plant to search for soil
-        search_start = y + h  # Bottom of plant
-        search_end = min(search_start + 30, height)  # Only look 30px below plant
-
-        # Method 1: Look for dark soil band
-        for sy in range(search_start, search_end, 1):
-            if sy >= height:
-                continue
-
-            # Check for soil color across a horizontal band
-            soil_pixels = 0
-            for sx in range(max(0, center_x - 30), min(width, center_x + 30)):
-                if sy < height and sx < width:
-                    pixel = image[sy, sx]
-                    # Brownish soil detection (red > blue, moderate brightness)
-                    if pixel[2] > pixel[0] and np.sum(pixel) < 450 and np.sum(pixel) > 50:
-                        soil_pixels += 1
-
-            # If enough soil pixels found in row
-            if soil_pixels > 15:
-                soil_y = sy
-                soil_line_found = True
-                break
-
-        # Method 2: Look for horizontal edge (soil surface or pot rim)
-        if not soil_line_found:
-            max_edge_strength = 0
-            strongest_edge_y = None
-
-            for sy in range(search_start, search_end, 1):
-                edge_row = edges[sy, max(0, center_x - 40):min(width, center_x + 40)]
-                edge_strength = np.sum(edge_row)
-
-                if edge_strength > max_edge_strength:
-                    max_edge_strength = edge_strength
-                    strongest_edge_y = sy
-
-            if max_edge_strength > 300 and strongest_edge_y is not None:
-                soil_y = strongest_edge_y
-                soil_line_found = True
-
-        # Method 3: Look for brightness transition
-        if not soil_line_found:
-            for sy in range(search_start, search_end, 1):
-                if sy + 5 < height and sy - 5 >= 0:
-                    above = np.mean(gray[sy - 5:sy, max(0, center_x - 20):min(width, center_x + 20)])
-                    below = np.mean(gray[sy:sy + 5, max(0, center_x - 20):min(width, center_x + 20)])
-
-                    if abs(above - below) > 20:
-                        soil_y = sy
-                        soil_line_found = True
-                        break
-
-        # Fallback: Use bottom of plant + small offset
-        if not soil_line_found:
-            soil_y = y + h + 5
-    else:
-        # For taller plants, use different soil detection approach
-        soil_y = None
-
-        # Start from midpoint of plant height
-        search_start = y + h // 2
-        search_end = min(y + h + 50, height - 10)
-
-        # Look for soil using color and texture
-        for sy in range(search_start, search_end, 2):
-            if sy >= height - 5:
-                continue
-
-            # Sample window around center line
-            window = image[sy:sy + 5, max(0, center_x - 20):min(width, center_x + 20)]
-
-            # Calculate color properties
-            if window.size > 0:
-                avg_color = np.mean(window, axis=(0, 1))
-
-                # Check for soil properties
-                if avg_color[2] > avg_color[0] and np.sum(avg_color) < 500:
-                    # Verify with texture check
-                    texture_above = np.std(gray[max(0, sy - 10):sy, max(0, center_x - 20):min(width, center_x + 20)])
-                    texture_below = np.std(
-                        gray[sy:min(height, sy + 10), max(0, center_x - 20):min(width, center_x + 20)])
-
-                    if abs(texture_above - texture_below) > 5:
-                        soil_y = sy
-                        break
-
-        # Fallback for tall plants
-        if soil_y is None:
-            soil_y = y + h * 2 // 3
-
-    # Ensure plant height is reasonable (with constraints)
-    plant_height = soil_y - top_y
-
-    # Sanity check - if height is unreasonable, use bounding box with offset
-    min_reasonable = 10
-    max_reasonable = height * 0.7
-
-    if plant_height < min_reasonable or plant_height > max_reasonable:
-        if is_small_plant:
-            soil_y = y + h + 5  # Small offset for small plants
-        else:
-            soil_y = y + h * 2 // 3  # Proportional for tall plants
-        plant_height = soil_y - top_y
-
-    # Draw the measurement visualization
-    cv2.line(result_image, (center_x, top_y), (center_x, soil_y), (0, 0, 255), 2)
-    cv2.circle(result_image, (center_x, top_y), 5, (255, 0, 0), -1)
-    cv2.circle(result_image, (center_x, soil_y), 5, (255, 0, 0), -1)
-
-    # Add text with height information
-    cv2.putText(result_image, f"Plant Height: {plant_height} pixels",
-                (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
-
-    # Resize for display
-    display_scale = min(1, 800 / max(width, height))
-    resized_image = cv2.resize(result_image, None,
-                               fx=display_scale,
-                               fy=display_scale,
-                               interpolation=cv2.INTER_AREA)
-
-    # Display result
-    cv2.imshow("Plant Height", resized_image)
     print(f"Plant height: {plant_height} pixels")
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+
+    if display:
+        # Draw the measurement visualization
+        center_x = x + w // 2
+        cv2.line(result_image, (center_x, top_y), (center_x, bottom_y), (0, 0, 255), 2)
+        cv2.circle(result_image, (center_x, top_y), 5, (255, 0, 0), -1)
+        cv2.circle(result_image, (center_x, bottom_y), 5, (255, 0, 0), -1)
+        cv2.rectangle(result_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        # Add text with height information
+        cv2.putText(result_image, f"Height: {plant_height}px",
+                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+        # Save annotated image for web
+        output_dir = os.path.join(os.path.dirname(image_path), "annotated")
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, os.path.basename(image_path))
+        cv2.imwrite(output_path, result_image)
+
+        # Resize for display/img
+        display_scale = min(1, 800 / max(width, height))
+        resized_image = cv2.resize(result_image, None,
+                                   fx=display_scale,
+                                   fy=display_scale,
+                                   interpolation=cv2.INTER_AREA)
+     
+        resized_dir = os.path.join(os.path.dirname(image_path), "resized")
+        os.makedirs(resized_dir, exist_ok=True)
+        resized_path = os.path.join(resized_dir, f"resized_{os.path.basename(image_path)}")
+        cv2.imwrite(resized_path, resized_image)
+
+        
+        cv2.imshow("Plant Height", resized_image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     return plant_height
 
-# Example usage
-measure_plant_height('Asset/Images/Selected images/height/2024_12_25_06PM.JPG')
+
+def extract_date_from_filename(filename):
+    """Extract date from filename with format YYYY_MM_DD_XXAM/PM.JPG"""
+    pattern = r'(\d{4})_(\d{2})_(\d{2})_(\d{2})([AP]M)'
+    match = re.search(pattern, filename)
+
+    if match:
+        year = int(match.group(1))
+        month = int(match.group(2))
+        day = int(match.group(3))
+        hour = int(match.group(4))
+        am_pm = match.group(5)
+
+        
+        if am_pm == 'PM' and hour < 12:
+            hour += 12
+        elif am_pm == 'AM' and hour == 12:
+            hour = 0
+
+        date_obj = datetime.datetime(year, month, day, hour)
+        return date_obj, f"{month}/{day} {hour:02d}:00"
+
+    return None, None
+
+
+
+if __name__ == "__main__":  
+    image_path = "Asset/Images/Selected images/height/2024_12_26_09AM.JPG" 
+    
+    # Extract date and time information from the filename
+    date_obj, date_label = extract_date_from_filename(os.path.basename(image_path))
+    
+    
+    if date_obj is None:
+        print(f"Could not extract date from {image_path}, skipping")
+    else:
+        
+        height = measure_plant_height(image_path, display=True)
+
+        # print the height and the date label
+        if height is not None:
+            print(f"Height: {height} pixels, Date: {date_label}")
+        else:
+      
+            print("Could not measure plant height")
+

@@ -17,10 +17,10 @@ def measure_plant_height(image_path, display=False):
     result_image = image.copy()
     height, width = image.shape[:2]
 
-    # STEP 1: ENHANCED PLANT DETECTION
+    #  ENHANCED PLANT DETECTION
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-    # Create broader masks for different plant colors
+    # Broader masks for different plant colors
     lower_green = np.array([25, 20, 20])
     upper_green = np.array([95, 255, 255])
     green_mask = cv2.inRange(hsv, lower_green, upper_green)
@@ -52,13 +52,11 @@ def measure_plant_height(image_path, display=False):
     x, y, w, h = cv2.boundingRect(plant_contour)
 
     # Get plant top and bottom points more precisely
-    # This helps get a more accurate height measurement
+    # GOt more accurate height measurement
     hull = cv2.convexHull(plant_contour)
     top_y = min(point[0][1] for point in hull)
     bottom_y = max(point[0][1] for point in hull)
 
-    # Calculate actual plant height (either using bounding box or hull points)
-    # In most cases, the convex hull gives a more precise measurement
     plant_height = bottom_y - top_y
 
     # If hull measurement seems incorrect, fall back to bounding box
@@ -73,29 +71,29 @@ def measure_plant_height(image_path, display=False):
         cv2.circle(result_image, (center_x, bottom_y), 5, (255, 0, 0), -1)
         cv2.rectangle(result_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        # Add text with height information
+
         cv2.putText(result_image, f"Height: {plant_height}px",
                     (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-        # Save annotated image for website display
+
         output_dir = os.path.join(os.path.dirname(image_path), "annotated")
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, os.path.basename(image_path))
         cv2.imwrite(output_path, result_image)
 
-        # Resize for display
+
         display_scale = min(1, 800 / max(width, height))
         resized_image = cv2.resize(result_image, None,
                                    fx=display_scale,
                                    fy=display_scale,
                                    interpolation=cv2.INTER_AREA)
-        # Save resized image
+
         resized_dir = os.path.join(os.path.dirname(image_path), "resized")
         os.makedirs(resized_dir, exist_ok=True)
         resized_path = os.path.join(resized_dir, f"resized_{os.path.basename(image_path)}")
         cv2.imwrite(resized_path, resized_image)
 
-        # Display result
+
         cv2.imshow("Plant Height", resized_image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
@@ -115,13 +113,11 @@ def extract_date_from_filename(filename):
         hour = int(match.group(4))
         am_pm = match.group(5)
 
-        # Adjust hour for PM
         if am_pm == 'PM' and hour < 12:
             hour += 12
         elif am_pm == 'AM' and hour == 12:
             hour = 0
 
-        # Create datetime object
         date_obj = datetime.datetime(year, month, day, hour)
         return date_obj, f"{month}/{day} {hour:02d}:00"
 
@@ -129,14 +125,12 @@ def extract_date_from_filename(filename):
 
 
 def analyze_plant_growth(directory):
-    """Analyze all plant images in the directory and plot height over time"""
-    # Lists to store data
+
     heights = []
     dates = []
     date_labels = []
     filenames = []
 
-    # Get all image files
     valid_extensions = ['.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG']
     image_files = [f for f in os.listdir(directory) if any(f.endswith(ext) for ext in valid_extensions)]
 
@@ -146,7 +140,7 @@ def analyze_plant_growth(directory):
 
     print(f"Found {len(image_files)} images to process")
 
-    # Create output directories
+
     output_dir = os.path.join(directory, "results")
     os.makedirs(output_dir, exist_ok=True)
 
@@ -164,7 +158,6 @@ def analyze_plant_growth(directory):
             print(f"Could not extract date from {filename}, skipping")
             continue
 
-        # Measure plant height and save annotated image
         height = measure_plant_height(image_path, display=True)
 
         if height is not None:
@@ -174,9 +167,8 @@ def analyze_plant_growth(directory):
             filenames.append(filename)
             print(f"Height: {height} pixels, Date: {date_label}")
 
-            # Save annotated image for web display
             result_image = cv2.imread(image_path)
-            x, y, w, h = 10, 10, 200, 30  # Position for text
+            x, y, w, h = 10, 10, 200, 30
             cv2.putText(result_image, f"Height: {height}px",
                         (x, y + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
@@ -187,16 +179,12 @@ def analyze_plant_growth(directory):
         print("No valid measurements obtained")
         return
 
-    # Sort data by date
     sorted_data = sorted(zip(dates, date_labels, heights, filenames))
     dates = [item[0] for item in sorted_data]
     date_labels = [item[1] for item in sorted_data]
     heights = [item[2] for item in sorted_data]
     filenames = [item[3] for item in sorted_data]
 
-    # Create multiple graph styles for website display
-
-    # 1. Standard line plot
     plt.figure(figsize=(12, 6))
     plt.plot(range(len(heights)), heights, marker='o', color='green', linewidth=2, markersize=8)
     plt.title("Plant Height Changes Over Time", fontsize=16)
@@ -214,7 +202,7 @@ def analyze_plant_growth(directory):
     plt.savefig(os.path.join(output_dir, "plant_height_growth.png"), dpi=300, bbox_inches='tight')
     print(f"Standard plot saved to {os.path.join(output_dir, 'plant_height_growth.png')}")
 
-    # 2. Web-optimized version (transparent background, thicker lines)
+    # Web-optimized version (transparent background, thicker lines)
     plt.figure(figsize=(12, 6))
     plt.plot(range(len(heights)), heights, marker='o', color='#00A86B', linewidth=3, markersize=10)
 

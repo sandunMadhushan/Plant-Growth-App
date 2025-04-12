@@ -12,7 +12,7 @@ The **Plant Growth App** is a Python-based application designed to help users mo
 - Generate line graphs to track plant growth trends.
 - Visualize changes in leaf count using `leaf_counts_line_graph.png`.
 
-### 🗂️ Data Processing
+### ⏳ Data Processing
 - Analyze plant growth metrics from `leaf_count_data.csv`.
 - Export processed data for further analysis.
 
@@ -21,7 +21,7 @@ The **Plant Growth App** is a Python-based application designed to help users mo
 
 ---
 
-## 🛠️ Technology Stack
+## 💻 Technology Stack
 
 ### 🎨 Frontend
 - HTML
